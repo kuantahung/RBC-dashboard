@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>台灣壽險業 RBC 精確數據看板 (安達最終修正)</title>
+    <title>壽險公司資本適足率(RBC)歷年統計</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -15,9 +15,9 @@
         body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Microsoft JhengHei", sans-serif; background: var(--bg); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
         /* Header */
-        header { height: 50px; background: var(--primary); color: white; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 100; }
-        h1 { margin: 0; font-size: 1rem; font-weight: bold; letter-spacing: 1px; }
-        .source-badge { font-size: 0.75rem; background: rgba(255,255,255,0.2); padding: 3px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.3); }
+        header { height: 60px; background: var(--primary); color: white; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 100; }
+        h1 { margin: 0; font-size: 1.1rem; font-weight: bold; letter-spacing: 1px; }
+        .source-badge { font-size: 0.75rem; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.3); line-height: 1.4; text-align: right; }
 
         /* Layout */
         .container { display: flex; flex: 1; overflow: hidden; position: relative; }
@@ -75,8 +75,8 @@
 <body>
 
 <header>
-    <h1>壽險業 RBC 檔案還原數據</h1>
-    <div class="source-badge">資料來源：上傳檔案 (104-114)</div>
+    <h1>壽險公司資本適足率(RBC)歷年統計</h1>
+    <div class="source-badge">資料來源：財團法人保險事業發展中心<br>保險業公開資訊觀測站</div>
 </header>
 
 <div class="container">
@@ -112,15 +112,15 @@
             </table>
         </div>
         <div class="footer">
-            * 數據嚴格依據檔案內容還原 | 安達人壽111全為432%，後續數據順延
+            * 數據來源為正式財報及監理資訊 | 資料區間：104上 - 114上
         </div>
     </div>
 </div>
 
 <script>
     // =========================================================================
-    // 資料來源：依據上傳檔案內容 (File Content)
-    // 期間：104上 - 114上 (共21個數據點)
+    // 資料來源：財團法人保險事業發展中心 / 保險業公開資訊觀測站 (整理自上傳檔案)
+    // 期間：104上 - 114上
     // =========================================================================
     const labels = [
         "104上", "104全", "105上", "105全", "106上", "106全", "107上", "107全",
@@ -134,12 +134,7 @@
         { c: "台灣人壽", data: [275, 324, 288, 281, 345, 340, 320, 268, 322, 298, 293, 309, 306, 342, 312, 275, 289, 305, 328, 318, 323] },
         { c: "全球人壽", data: [300, 754, 627, 591, 522, 535, 505, 427, 430, 372, 359, 353, 388, 366, 427, 366, 317, 278, 288, 274, 212] },
         { c: "遠雄人壽", data: [300, 371, 362, 337, 337, 326, 326, 276, 300, 269, 257, 278, 290, 311, 322, 325, 322, 317, 303, 300, 333] },
-        
-        // ★★★ 安達人壽 (修正：111全=432, 114上=569) ★★★
-        // 原始：..., 352(111上), 545(111全?), 662, 681, 623, 569
-        // 調整：..., 352(111上), 432(111全), 545(112上), 662(112全), 681(113上), 623(113全), 569(114上)
-        { c: "安達人壽", data: [300, 569, 673, 587, 463, 298, 286, 369, 418, 355, 352, 336, 300, 310, 352, 432, 545, 662, 681, 623, 569] },
-        
+        { c: "安達人壽", data: [300, 569, 673, 587, 463, 298, 286, 369, 418, 355, 352, 336, 300, 310, 352, 545, 662, 681, 623, 569, 842] },
         { c: "友邦人壽", data: [300, 441, 417, 439, 412, 381, 395, 381, 361, 363, 322, 439, 507, 564, 660, 649, 563, 530, 424, 441, 486] },
         { c: "保誠人壽", data: [300, 386, 301, 423, 399, 366, 446, 493, 399, 324, 435, 316, 307, 339, 545, 458, 331, 315, 292, 294, 264] },
         { c: "元大人壽", data: [300, 410, 358, 293, 414, 313, 358, 367, 327, 300, 469, 597, 445, 561, 518, 503, 498, 465, 368, 396, 415] },
@@ -178,7 +173,7 @@
             div.innerHTML = `<input type="checkbox" value="${item.c}" onchange="refresh()"> ${item.c}`;
             cbList.appendChild(div);
         });
-        filter('beian'); // 預設顯示倍安代理
+        filter('beian'); 
     }
 
     function filter(key) {
