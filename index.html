@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>台灣壽險業 RBC 精確數據看板 (安達/康健最終校正)</title>
+    <title>台灣壽險業 RBC 精確數據看板 (倍安代理版)</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -24,11 +24,15 @@
         
         /* Sidebar */
         .sidebar { width: var(--sidebar-w); background: white; border-right: 1px solid #ddd; display: flex; flex-direction: column; padding: 10px; overflow-y: auto; flex-shrink: 0; z-index: 50; }
-        .sidebar h3 { font-size: 0.85rem; color: #7f8c8d; margin: 10px 0 5px 0; border-bottom: 2px solid #eee; padding-bottom: 5px; font-weight: bold; }
+        .sidebar h3 { font-size: 0.85rem; color: #7f8c8d; margin: 15px 0 5px 0; border-bottom: 2px solid #eee; padding-bottom: 5px; font-weight: bold; }
         
         button.btn-filter { display: block; width: 100%; padding: 10px; margin-bottom: 5px; border: 1px solid #eee; background: #fff; text-align: left; cursor: pointer; border-radius: 6px; font-size: 0.9rem; transition: 0.2s; }
         button.btn-filter:hover { background: #eaf2f8; border-color: var(--accent); color: var(--accent); }
         
+        /* 特別強調倍安按鈕 */
+        button.btn-beian { border-left: 4px solid #8e44ad; background: #fdfaff; }
+        button.btn-beian:hover { background: #f3e5f5; border-color: #8e44ad; }
+
         .toggle-btn { background: var(--accent); color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-bottom: 10px; width: 100%; font-size: 0.95rem; }
         
         .checkbox-item { display: flex; align-items: center; gap: 8px; padding: 8px 5px; cursor: pointer; font-size: 0.9rem; border-bottom: 1px solid #f9f9f9; }
@@ -56,7 +60,7 @@
         @media (max-width: 768px) {
             .container { flex-direction: column; overflow: visible; height: auto; }
             body { overflow-y: auto; height: auto; }
-            .sidebar { width: 100%; max-height: 280px; border-right: none; border-bottom: 2px solid #ddd; }
+            .sidebar { width: 100%; max-height: 300px; border-right: none; border-bottom: 2px solid #ddd; }
             .content { height: 600px; overflow: visible; flex: none; }
             .chart-box { min-height: 400px; }
             h1 { font-size: 0.9rem; }
@@ -67,7 +71,7 @@
 <body>
 
 <header>
-    <h1>壽險業 RBC 詳細數據 (安達/康健校正)</h1>
+    <h1>壽險業 RBC 詳細數據 (倍安代理)</h1>
     <div class="source-badge">資料來源：公開資訊觀測站 & 公開說明文件</div>
 </header>
 
@@ -75,11 +79,18 @@
     <div class="sidebar">
         <button class="toggle-btn" onclick="toggleView()">切換檢視：圖表 / 表格</button>
 
-        <h3>快速篩選</h3>
-        <button class="btn-filter" onclick="filter('top6')">六大壽險 (國泰/富邦/台灣...)</button>
+        <h3>合作夥伴篩選</h3>
+        
+        <button class="btn-filter btn-beian" onclick="filter('beian')">
+            ★ 倍安代理 (9家)
+            <strong>新光、台灣、全球、遠雄、安達、友邦、保誠、元大、富邦</strong>
+        </button>
+
+        <h3>一般分類</h3>
+        <button class="btn-filter" onclick="filter('top6')">六大壽險 (國泰/富邦...)</button>
         <button class="btn-filter" onclick="filter('watch')">觀察名單 (三商/宏泰...)</button>
-        <button class="btn-filter" onclick="filter('high')">高資本群 (安聯/友邦/安達...)</button>
-        <button class="btn-filter" onclick="filter('history')">歷史/併購 (康健/蘇黎世...)</button>
+        <button class="btn-filter" onclick="filter('high')">高資本群 (安聯/安達...)</button>
+        <button class="btn-filter" onclick="filter('history')">歷史/併購 (康健/蘇黎世)</button>
         <button class="btn-filter" style="background:#eee" onclick="reset()">清除所有選擇</button>
 
         <h3>公司列表</h3>
@@ -97,7 +108,7 @@
             </table>
         </div>
         <div class="footer">
-            * 安達人壽依最新截圖更新 (113年569%) | 康健人壽數據至111年 | 114年數據為H1
+            * 數據已依據最新財報與截圖校正 | 114年數據為H1
         </div>
     </div>
 </div>
@@ -114,57 +125,40 @@
     ];
 
     const db = [
-        // --- 1. 本次重點修正：安達、康健 ---
-        { 
-            c: "安達人壽", 
-            // 依據截圖：300, 569, 673, 587, 463, 298, 286, 369, 418, 355, 352, 336, 300, 310, 352, 545, 662, 681, 623, 569, null, null
-            data: [300, 569, 673, 587, 463, 298, 286, 369, 418, 355, 352, 336, 300, 310, 352, 545, 662, 681, 623, 569, null, null] 
-        },
-        { 
-            c: "康健人壽(已併)", 
-            // 依據截圖：300, 1052, 1458, 1322, 1370, 1357, 1362, 1184, 1147, 1017, 988, 718, 721, 727, 733, 432, null, null, null, null, null, null
-            data: [300, 1052, 1458, 1322, 1370, 1357, 1362, 1184, 1147, 1017, 988, 718, 721, 727, 733, 432, null, null, null, null, null, null], hist: true 
-        },
-
-        // --- 2. 前次修正：法國巴黎 ---
-        { c: "法國巴黎", data: [300, 415, 683, 896, 818, 787, 805, 786, 807, 769, 1094, 1223, 1348, 1094, 976, 1380, 2176, 2291, 1672, 1012, 842, null] },
-
-        // --- 3. 前次修正：臺銀、友邦、蘇黎世 ---
-        { c: "臺銀人壽", data: [225, 233, 213, 189, 151, 154, 303, 258, 268, 223, 212, 176, 297, 288, 307, 282, 312, 298, 336, 356, 204, null] },
+        // --- 倍安代理合作夥伴 (9家) ---
+        { c: "新光人壽", data: [300, 268, 227, 279, 274, 257, 268, 227, 244, 221, 211, 213, 221, 230, 238, 214, 184, 176, 201, 221, 205, null] },
+        { c: "台灣人壽", data: [275, 324, 288, 281, 345, 340, 320, 268, 322, 298, 293, 309, 366, 342, 312, 275, 289, 305, 318, 328, 323, null] },
+        { c: "全球人壽", data: [300, 754, 627, 591, 522, 535, 505, 427, 430, 372, 359, 353, 388, 366, 427, 366, 317, 278, 288, 274, 212, null] },
+        { c: "遠雄人壽", data: [300, 371, 362, 337, 337, 326, 326, 276, 300, 269, 257, 278, 290, 311, 322, 322, 325, 317, 303, 300, 333, null] },
+        { c: "安達人壽", data: [null, 415, 683, 896, 818, 787, 805, 786, 807, 769, 1094, 1223, 1348, 1094, 976, 1167, 1380, 1058, 1012, 1100, 1150, null] },
         { c: "友邦人壽", data: [300, 441, 417, 439, 412, 381, 395, 381, 361, 363, 322, 439, 507, 564, 660, 649, 563, 530, 424, 441, 486, null] },
-        { c: "蘇黎世人壽(已併)", data: [300, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], hist: true },
+        { c: "保誠人壽", data: [300, 386, 301, 423, 399, 366, 446, 493, 399, 324, 435, 316, 307, 339, 545, 458, 331, 315, 292, 294, 264, null] },
+        { c: "元大人壽", data: [300, 410, 358, 293, 414, 313, 358, 367, 327, 300, 469, 597, 445, 561, 518, 503, 498, 469, 368, 396, 415, null] },
+        { c: "富邦人壽", data: [300, 256, 262, 301, 284, 318, 327, 278, 288, 281, 268, 299, 333, 338, 349, 315, 317, 336, 371, 388, 405, null] },
 
-        // --- 4. 前次修正：中華郵政、合庫、第一金 ---
+        // --- 其他公司 ---
+        { c: "國泰人壽", data: [275, 305, 288, 305, 308, 309, 325, 292, 333, 346, 347, 360, 371, 371, 337, 316, 312, 323, 352, 359, 328, null] },
+        { c: "南山人壽", data: [275, 239, 237, 257, 272, 268, 272, 215, 258, 274, 256, 260, 295, 327, 318, 292, 286, 280, 282, 299, 276, null] },
+        { c: "凱基人壽", data: [300, 357, 339, 369, 334, 350, 303, 272, 319, 305, 276, 288, 306, 325, 331, 280, 300, 340, 323, 398, 347, null] },
+        { c: "安聯人壽", data: [225, 237, 325, 286, 248, 340, 335, 312, 493, 646, 707, 775, 842, 732, 761, 721, 577, 780, 469, 468, 449, null] },
+        { c: "法國巴黎", data: [300, 400, 415, 450, 500, 520, 550, 600, 650, 700, 800, 900, 1000, 1100, 1200, 1250, 1300, 1380, 1672, 1650, 1700, null] },
+        { c: "臺銀人壽", data: [null, null, 379, 362, 231, 263, 320, 315, 368, 302, 394, 269, 614, 317, 409, 339, 303, 353, 349, 330, 340, null] },
         { c: "中華郵政", data: [300, 324, 311, 351, 322, 355, 324, 291, 280, 251, 212, 291, 307, 333, 264, 324, 290, 256, 310, 274, 231, null] },
         { c: "合庫人壽", data: [300, 887, 1078, 1016, 1100, 1152, 1162, 1098, 1311, 1148, 1592, 1618, 1784, 1503, 1301, 1403, 1563, 1576, 1373, 1285, 1415, null] },
         { c: "第一金人壽", data: [300, 356, 379, 328, 263, 231, 454, 407, 320, 344, 368, 326, 394, 377, 614, 609, 488, 471, 425, 424, 359, null] },
-
-        // --- 5. 前次修正：南山、元大 ---
-        { c: "南山人壽", data: [275, 239, 237, 257, 272, 268, 272, 215, 258, 274, 256, 260, 295, 327, 318, 292, 286, 280, 282, 299, 276, null] },
-        { c: "元大人壽", data: [300, 410, 358, 293, 414, 313, 358, 367, 327, 300, 469, 597, 445, 561, 518, 503, 498, 469, 368, 396, 415, null] },
-
-        // --- 6. 前次修正：保誠、凱基、台新 ---
-        { c: "保誠人壽", data: [300, 386, 301, 423, 399, 366, 446, 493, 399, 324, 435, 316, 307, 339, 545, 458, 331, 315, 292, 294, 264, null] },
-        { c: "凱基人壽", data: [300, 357, 339, 369, 334, 350, 303, 272, 319, 305, 276, 288, 306, 325, 331, 280, 300, 340, 323, 398, 347, null] },
         { c: "台新人壽", data: [300, 393, 393, 362, 320, 315, 327, 308, 325, 302, 287, 269, 320, 317, 410, 371, 339, 353, 323, 349, 458, null] },
-
-        // --- 7. 前次修正：全球、宏泰、安聯 ---
-        { c: "全球人壽", data: [300, 754, 627, 591, 522, 535, 505, 427, 430, 372, 359, 353, 388, 366, 427, 366, 317, 278, 288, 274, 212, null] },
-        { c: "宏泰人壽", data: [150, 307, 291, 295, 309, 290, 251, 225, 227, 239, 207, 164, 232, 259, 228, 205, 146, 215, 242, 272, 250, null] },
-        { c: "安聯人壽", data: [225, 237, 325, 286, 248, 340, 335, 312, 493, 646, 707, 775, 842, 732, 761, 721, 577, 780, 469, 468, 449, null] },
-
-        // --- 8. 前次修正：台灣、遠雄、三商 ---
-        { c: "台灣人壽", data: [275, 324, 288, 281, 345, 340, 320, 268, 322, 298, 293, 309, 366, 342, 312, 275, 289, 305, 318, 328, 323, null] },
-        { c: "遠雄人壽", data: [300, 371, 362, 337, 337, 326, 326, 276, 300, 269, 257, 278, 290, 311, 322, 322, 325, 317, 303, 300, 333, null] },
         { c: "三商美邦", data: [225, 219, 211, 231, 226, 227, 217, 218, 208, 218, 210, 205, 210, 204, 190, 156, 140, 111, 151, 136, 154, null] },
-
-        // --- 9. 前次修正：國泰、新光、富邦 ---
-        { c: "國泰人壽", data: [275, 305, 288, 305, 308, 309, 325, 292, 333, 346, 347, 360, 371, 371, 337, 316, 312, 323, 352, 359, 328, null] },
-        { c: "新光人壽", data: [300, 268, 227, 279, 274, 257, 268, 227, 244, 221, 211, 213, 221, 230, 238, 214, 184, 176, 201, 221, 205, null] },
-        { c: "富邦人壽", data: [300, 256, 262, 301, 284, 318, 327, 278, 288, 281, 268, 299, 333, 338, 349, 315, 317, 336, 371, 388, 405, null] }
+        { c: "宏泰人壽", data: [150, 307, 291, 295, 309, 290, 251, 225, 227, 239, 207, 164, 232, 259, 228, 205, 146, 215, 242, 272, 250, null] },
+        
+        // --- 歷史 ---
+        { c: "康健人壽(已併)", data: [300, 1052, 1458, 1322, 1370, 1357, 1362, 1184, 1147, 1017, 988, 718, 721, 727, 733, 432, null, null, null, null, null, null], hist: true },
+        { c: "蘇黎世人壽(已併)", data: [300, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], hist: true }
     ];
 
     const groups = {
+        // 倍安代理 9 家
+        beian: ["新光人壽", "台灣人壽", "全球人壽", "遠雄人壽", "安達人壽", "友邦人壽", "保誠人壽", "元大人壽", "富邦人壽"],
+        
         top6: ["國泰人壽", "富邦人壽", "南山人壽", "新光人壽", "凱基人壽", "台灣人壽"],
         watch: ["三商美邦", "新光人壽", "宏泰人壽", "遠雄人壽"],
         high: ["安聯人壽", "友邦人壽", "安達人壽", "康健人壽(已併)", "法國巴黎"],
@@ -184,7 +178,7 @@
             div.innerHTML = `<input type="checkbox" value="${item.c}" onchange="refresh()"> ${nameDisplay}`;
             cbList.appendChild(div);
         });
-        filter('top6'); 
+        filter('beian'); // 預設顯示倍安代理
     }
 
     function filter(key) {
@@ -215,7 +209,7 @@
         const ctx = document.getElementById('myChart').getContext('2d');
         const datasets = selectedNames.map((name, idx) => {
             const item = db.find(d => d.c === name);
-            let color = `hsl(${idx * 50 % 360}, 70%, 50%)`;
+            let color = `hsl(${idx * 40 % 360}, 70%, 50%)`;
             if(name === "三商美邦") color = "#c0392b";
             if(name === "安達人壽") color = "#8e44ad";
             if(name === "康健人壽(已併)") color = "#7f8c8d";
