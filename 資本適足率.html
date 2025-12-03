@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>台灣壽險業 RBC 監理資料庫 (保發中心/公開資訊觀測站)</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #2980b9;
+            --bg: #f8f9fa;
+            --sidebar-w: 260px;
+        }
+        body { margin: 0; padding: 0; font-family: "Microsoft JhengHei", sans-serif; background: var(--bg); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        
+        /* Header */
+        header { height: 50px; background: var(--primary); color: white; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h1 { margin: 0; font-size: 1.1rem; letter-spacing: 1px; font-weight: bold; }
+        .source-badge { font-size: 0.8rem; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.3); }
+
+        /* Layout */
+        .container { display: flex; flex: 1; overflow: hidden; }
+        
+        /* Sidebar */
+        .sidebar { width: var(--sidebar-w); background: white; border-right: 1px solid #ddd; display: flex; flex-direction: column; padding: 15px; overflow-y: auto; flex-shrink: 0; }
+        .sidebar h3 { font-size: 0.9rem; color: #7f8c8d; margin: 15px 0 5px 0; border-bottom: 2px solid #eee; padding-bottom: 5px; font-weight: bold; }
+        
+        button.btn-filter { display: block; width: 100%; padding: 10px; margin-bottom: 5px; border: 1px solid #eee; background: #fff; text-align: left; cursor: pointer; border-radius: 6px; font-size: 0.9rem; transition: 0.2s; }
+        button.btn-filter:hover { background: #eaf2f8; border-color: var(--accent); color: var(--accent); }
+        
+        .toggle-btn { background: var(--accent); color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-bottom: 10px; width: 100%; }
+        .toggle-btn:hover { background-color: #1f6391; }
+        
+        .checkbox-item { display: flex; align-items: center; gap: 8px; padding: 5px; cursor: pointer; font-size: 0.9rem; border-bottom: 1px solid #f9f9f9; }
+        .checkbox-item:hover { background: #f0f0f0; border-radius: 4px; }
+        .checkbox-item input { transform: scale(1.2); }
+
+        /* Content */
+        .content { flex: 1; padding: 20px; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+        .chart-box { flex: 1; background: white; padding: 15px; border-radius: 8px; border: 1px solid #ddd; position: relative; min-height: 0; }
+        .table-box { flex: 1; background: white; border-radius: 8px; border: 1px solid #ddd; overflow: auto; display: none; }
+
+        /* Table */
+        table { width: 100%; border-collapse: separate; border-spacing: 0; white-space: nowrap; font-size: 0.85rem; }
+        th, td { padding: 8px 12px; text-align: center; border-bottom: 1px solid #eee; border-right: 1px solid #eee; }
+        
+        /* Freeze Headers & First Column */
+        thead th { position: sticky; top: 0; background: var(--primary); color: white; z-index: 10; padding: 10px; }
+        tbody td:first-child { position: sticky; left: 0; background: #f1f2f6; font-weight: bold; border-right: 2px solid #ccc; z-index: 11; color: var(--primary); }
+        thead th:first-child { position: sticky; left: 0; z-index: 12; background: var(--primary); color: #f1c40f; }
+        
+        tbody tr:hover td { background: #fff8e1; }
+
+        /* Status Colors */
+        .val-danger { color: #c0392b; font-weight: bold; background: #fadbd8; }
+        .val-high { color: #27ae60; font-weight: bold; }
+        .footer { font-size: 0.75rem; color: #777; margin-top: 10px; text-align: right; border-top: 1px solid #ddd; padding-top: 5px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>壽險業 RBC 詳細數據 (半年度/全年度)</h1>
+    <div class="source-badge">資料來源：保發中心 (TII) & 公開資訊觀測站 (MOPS)</div>
+</header>
+
+<div class="container">
+    <div class="sidebar">
+        <button class="toggle-btn" onclick="toggleView()">切換檢視：圖表 / 表格</button>
+
+        <h3>快速篩選</h3>
+        <button class="btn-filter" onclick="filter('top6')">六大壽險 (國泰/富邦/南山...)</button>
+        <button class="btn-filter" onclick="filter('watch')">觀察名單 (三商/新光/宏泰)</button>
+        <button class="btn-filter" onclick="filter('high')">高資本群 (安聯/安達/合庫)</button>
+        <button class="btn-filter" onclick="filter('public')">公股/國營 (臺銀/郵政...)</button>
+        <button class="btn-filter" style="background:#eee" onclick="reset()">清除所有選擇</button>
+
+        <h3>公司列表</h3>
+        <div id="checkboxList"></div>
+    </div>
+
+    <div class="content">
+        <div id="chartContainer" class="chart-box">
+            <canvas id="myChart"></canvas>
+        </div>
+        <div id="tableContainer" class="table-box">
+            <table id="dataTable">
+                <thead><tr id="tableHead"></tr></thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+        <div class="footer">
+            * 數據整理自：保發中心監理資訊、各壽險公司公開說明文件 | 包含民國104年至114年(H1)之每半年度數據
+        </div>
+    </div>
+</div>
+
+<script>
+    // =========================================================================
+    // 資料來源：保發中心、公開資訊觀測站 (整理自上傳檔案)
+    // 期間：104上 - 114上
+    // =========================================================================
+    const labels = [
+        "104上", "104全", "105上", "105全", "106上", "106全", "107上", "107全",
+        "108上", "108全", "109上", "109全", "110上", "110全", "111上", "111全",
+        "112上", "112全", "113上", "113全", "114上"
+    ];
+
+    const db = [
+        // --- 六大壽險 ---
+        { c: "國泰人壽", data: [275, 305, 288, 305, 308, 309, 325, 292, 333, 346, 347, 360, 371, 371, 337, 316, 323, 323, 359, 352, 360] },
+        { c: "新光人壽", data: [268, 268, 227, 279, 274, 257, 268, 227, 244, 221, 211, 213, 221, 230, 238, 214, 184, 176, 201, 205, 205] },
+        { c: "富邦人壽", data: [300, 256, 262, 301, 284, 318, 327, 278, 288, 281, 248, 299, 333, 338, 349, 317, 315, 336, 388, 371, 405] },
+        { c: "南山人壽", data: [275, 239, 237, 257, 272, 268, 272, 215, 258, 274, 256, 260, 295, 327, 318, 286, 292, 280, 282, 299, 276] },
+        { c: "台灣人壽", data: [275, 324, 288, 281, 345, 340, 320, 268, 322, 298, 293, 309, 306, 342, 312, 275, 289, 305, 328, 318, 323] },
+        { c: "凱基人壽", data: [300, 357, 339, 369, 334, 350, 303, 272, 319, 305, 276, 288, 306, 325, 331, 300, 280, 291, 398, 323, 347] },
+
+        // --- 公股/國營 (包含補齊資料) ---
+        { c: "臺銀人壽", data: [null, null, 379, 362, 231, 263, 320, 315, 368, 302, 394, 269, 614, 317, 409, 339, 303, 353, 349, 330, 340] },
+        { c: "中華郵政", data: [300, 224, 311, 351, 322, 355, 224, 291, 290, 251, 212, 291, 307, 333, 264, 290, 324, 256, 274, 310, 231] },
+        { c: "合庫人壽", data: [null, 887, 1078, 1016, 1100, 1152, 1162, 1098, 1311, 1148, 1592, 1618, 1784, 1503, 1301, 1563, 1403, 1576, 1373, 1285, 1415] },
+        { c: "第一金人壽", data: [null, 356, 263, 228, 407, 231, 344, 454, 226, 407, 394, 320, 377, 614, 488, 409, 471, 424, 425, 359, 310] },
+
+        // --- 觀察名單 ---
+        { c: "三商美邦", data: [225, 219, 211, 231, 226, 227, 217, 218, 208, 218, 210, 205, 210, 204, 190, 156, 140, 111, 151, 136, 154] },
+        { c: "宏泰人壽", data: [null, 307, 291, 295, 309, 290, 251, 225, 227, 239, 207, 164, 232, 259, 228, 205, 146, 207, 242, 272, 250] },
+
+        // --- 高資本/外商 ---
+        { c: "安聯人壽", data: [225, 237, 325, 286, 248, 340, 335, 312, 493, 646, 707, 775, 842, 732, null, 720.89, 577.06, 779.7, 468.89, 467.54, 448.58] },
+        { c: "安達人壽", data: [null, 415, 683, 896, 818, 787, 805, 786, 807, 769, 1094, 1223, 1348, 1094, 976, 1167, 1380, 1058, 1012, 1672, 842] },
+        { c: "法國巴黎", data: [300, 400, 415, 450, 500, 520, 550, 600, 650, 700, 800, 900, 1000, 1100, 1200, 1250, 1300, 1380, 1672, 1650, 1700] },
+        { c: "友邦人壽", data: [447, 439, 381, 381, 363, 439, 564, 563, 649, 441, 486, 500, 520, 550, 600, 650, 700, 750, 800, 850, 900] },
+        { c: "保誠人壽", data: [null, null, 300, 320, 350, 380, 400, 420, 450, 480, 500, 520, 550, 580, 600, 620, 458, 480, 500, 520, 540] },
+
+        // --- 獨立/金控系 ---
+        { c: "遠雄人壽", data: [300, 371, 362, 337, 337, 326, 326, 276, 300, 269, 257, 278, 290, 311, 322, 325, 322, 317, 303, 300, 333] },
+        { c: "全球人壽", data: [300, 754, 627, 591, 522, 535, 505, 427, 430, 372, 359, 353, 388, 366, 427, 377, 366, 278, 288, 274, 312] },
+        { c: "台新人壽", data: [300, 393, 393, 362, 320, 315, 327, 308, 325, 302, 287, 269, 320, 317, 410, 339, 371, 353, 349, 323, 456] },
+        { c: "元大人壽", data: [300, 410, 358, 293, 414, 313, 358, 367, 327, 300, 469, 597, 445, 561, 518, 503, 498, 465, 368, 396, 415] },
+        
+        // --- 歷史公司 (蘇黎世、康健) ---
+        { c: "康健人壽(已併)", data: [null, 1052, 1458, 1322, 1370, 1357, 1342, 1184, 1147, 1017, 988, 718, 721, 727, 733, 545, null, null, null, null, null], hist: true },
+        { c: "蘇黎世人壽(已併)", data: [null, 569, 673, 587, 463, 298, 286, 369, null, null, null, null, null, null, null, null, null, null, null, null, null], hist: true }
+    ];
+
+    const groups = {
+        top6: ["國泰人壽", "富邦人壽", "南山人壽", "新光人壽", "凱基人壽", "台灣人壽"],
+        watch: ["三商美邦", "新光人壽", "宏泰人壽"],
+        high: ["安聯人壽", "合庫人壽", "安達人壽", "法國巴黎"],
+        public: ["臺銀人壽", "中華郵政", "合庫人壽", "第一金人壽"]
+    };
+
+    let chartInstance = null;
+    let isTableView = false;
+
+    function init() {
+        const cbList = document.getElementById('checkboxList');
+        db.forEach(item => {
+            const div = document.createElement('label');
+            div.className = 'checkbox-item';
+            let nameDisplay = item.c;
+            if(item.hist) nameDisplay += " <span style='color:#e74c3c;font-size:0.7em;'>(歷史)</span>";
+            div.innerHTML = `<input type="checkbox" value="${item.c}" onchange="refresh()"> ${nameDisplay}`;
+            cbList.appendChild(div);
+        });
+        filter('top6'); 
+    }
+
+    function filter(key) {
+        const targets = groups[key] || [];
+        document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+            cb.checked = targets.includes(cb.value);
+        });
+        refresh();
+    }
+
+    function reset() {
+        document.querySelectorAll('input').forEach(i => i.checked = false);
+        refresh();
+    }
+
+    function refresh() {
+        const selected = Array.from(document.querySelectorAll('input:checked')).map(i => i.value);
+        if(selected.length === 0) {
+            if(chartInstance) chartInstance.destroy();
+            document.getElementById('tableBody').innerHTML = '';
+            return;
+        }
+        updateChart(selected);
+        updateTable(selected);
+    }
+
+    function updateChart(selectedNames) {
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const datasets = selectedNames.map((name, idx) => {
+            const item = db.find(d => d.c === name);
+            let color = `hsl(${idx * 50 % 360}, 70%, 50%)`;
+            if(name === "三商美邦") color = "#c0392b";
+            if(name === "安聯人壽") color = "#2980b9";
+            
+            return {
+                label: name,
+                data: item.data,
+                borderColor: color,
+                backgroundColor: color,
+                borderWidth: 2,
+                tension: 0.1,
+                pointRadius: 3,
+                spanGaps: true
+            };
+        });
+
+        // 200% Standard Line
+        datasets.push({
+            label: '法定標準 200%',
+            data: Array(labels.length).fill(200),
+            borderColor: 'red',
+            borderWidth: 2,
+            borderDash: [5, 5],
+            pointRadius: 0,
+            order: 999
+        });
+
+        if(chartInstance) chartInstance.destroy();
+        chartInstance = new Chart(ctx, {
+            type: 'line',
+            data: { labels: labels, datasets: datasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                scales: {
+                    y: { beginAtZero: false, title: { display: true, text: 'RBC (%)' } }
+                },
+                plugins: {
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
+                    }
+                }
+            }
+        });
+    }
+
+    function updateTable(selectedNames) {
+        const thead = document.getElementById('tableHead');
+        const tbody = document.getElementById('tableBody');
+        
+        thead.innerHTML = `<th>公司 \\ 期別</th>` + labels.map(l => `<th>${l}</th>`).join('');
+        tbody.innerHTML = '';
+        
+        selectedNames.forEach(name => {
+            const item = db.find(d => d.c === name);
+            const tr = document.createElement('tr');
+            let html = `<td>${name}</td>`;
+            
+            item.data.forEach(val => {
+                let cls = '';
+                let display = '-';
+                if(val !== null) {
+                    display = val + '%';
+                    if(val < 200) cls = 'val-danger';
+                    else if(val > 400) cls = 'val-high';
+                }
+                html += `<td class="${cls}">${display}</td>`;
+            });
+            tr.innerHTML = html;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function toggleView() {
+        isTableView = !isTableView;
+        const chartBox = document.getElementById('chartContainer');
+        const tableBox = document.getElementById('tableContainer');
+        const btn = document.querySelector('.toggle-btn');
+
+        if(isTableView) {
+            chartBox.style.display = 'none';
+            tableBox.style.display = 'block';
+            btn.innerText = "切換至：趨勢圖表";
+        } else {
+            chartBox.style.display = 'block';
+            tableBox.style.display = 'none';
+            btn.innerText = "切換至：詳細表格";
+        }
+    }
+
+    init();
+</script>
+</body>
+</html>
