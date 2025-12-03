@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>台灣壽險業 RBC 精確數據看板 (倍安代理專用版)</title>
+    <title>台灣壽險業 RBC 精確數據看板 (現存公司專用)</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -26,7 +26,7 @@
         .sidebar { width: var(--sidebar-w); background: white; border-right: 1px solid #ddd; display: flex; flex-direction: column; padding: 10px; overflow-y: auto; flex-shrink: 0; z-index: 50; }
         .sidebar h3 { font-size: 0.85rem; color: #7f8c8d; margin: 15px 0 5px 0; border-bottom: 2px solid #eee; padding-bottom: 5px; font-weight: bold; }
         
-        button.btn-filter { display: block; width: 100%; padding: 12px; margin-bottom: 6px; border: 1px solid #eee; background: #fff; text-align: left; cursor: pointer; border-radius: 6px; font-size: 0.95rem; transition: 0.2s; }
+        button.btn-filter { display: block; width: 100%; padding: 12px; margin-bottom: 6px; border: 1px solid #eee; background: #fff; text-align: left; cursor: pointer; border-radius: 6px; font-size: 0.9rem; transition: 0.2s; }
         button.btn-filter:hover { background: #eaf2f8; border-color: var(--accent); color: var(--accent); }
         button.btn-filter strong { display: block; font-size: 0.75rem; color: #888; margin-top: 3px; font-weight: normal; }
 
@@ -78,7 +78,7 @@
 <body>
 
 <header>
-    <h1>壽險業 RBC 精確數據 (倍安代理)</h1>
+    <h1>壽險業 RBC 精確數據 (現存公司)</h1>
     <div class="source-badge">資料來源：公開資訊觀測站 & 公開說明文件</div>
 </header>
 
@@ -96,7 +96,6 @@
         <button class="btn-filter" onclick="filter('top6')">六大壽險 (國泰/富邦...)</button>
         <button class="btn-filter" onclick="filter('high')">高資本群 (安聯/安達...)</button>
         <button class="btn-filter" onclick="filter('watch')">觀察名單 (三商/宏泰...)</button>
-        <button class="btn-filter" onclick="filter('history')">歷史/併購 (康健/蘇黎世...)</button>
         <button class="btn-filter" style="background:#eee" onclick="reset()">清除所有選擇</button>
 
         <h3>公司列表</h3>
@@ -114,7 +113,7 @@
             </table>
         </div>
         <div class="footer">
-            * 數據整理自上傳檔案與最新財報 | 三商美邦114H1為154.27%
+            * 數據整理自上傳檔案與最新財報 | 114年數據為H1
         </div>
     </div>
 </div>
@@ -142,7 +141,7 @@
         { c: "元大人壽", data: [300, 410, 358, 293, 414, 313, 358, 367, 327, 300, 469, 597, 445, 561, 518, 503, 498, 469, 368, 396, 415, null] },
         { c: "富邦人壽", data: [300, 256, 262, 301, 284, 318, 327, 278, 288, 281, 268, 299, 333, 338, 349, 315, 317, 336, 371, 388, 405, null] },
 
-        // --- 其他公司 ---
+        // --- 其他現存公司 ---
         { c: "國泰人壽", data: [275, 305, 288, 305, 308, 309, 325, 292, 333, 346, 347, 360, 371, 371, 337, 316, 312, 323, 352, 359, 328, null] },
         { c: "南山人壽", data: [275, 239, 237, 257, 272, 268, 272, 215, 258, 274, 256, 260, 295, 327, 318, 292, 286, 280, 282, 299, 276, null] },
         { c: "凱基人壽", data: [300, 357, 339, 369, 334, 350, 303, 272, 319, 305, 276, 288, 306, 325, 331, 280, 300, 340, 323, 398, 347, null] },
@@ -154,11 +153,7 @@
         { c: "第一金人壽", data: [300, 356, 379, 328, 263, 231, 454, 407, 320, 344, 368, 326, 394, 377, 614, 609, 488, 471, 425, 424, 359, null] },
         { c: "台新人壽", data: [300, 393, 393, 362, 320, 315, 327, 308, 325, 302, 287, 269, 320, 317, 410, 371, 339, 353, 323, 349, 458, null] },
         { c: "三商美邦", data: [225, 219, 211, 231, 226, 227, 217, 218, 208, 218, 210, 205, 210, 204, 190, 156, 140, 111, 151, 136, 154, null] },
-        { c: "宏泰人壽", data: [150, 307, 291, 295, 309, 290, 251, 225, 227, 239, 207, 164, 232, 259, 228, 205, 146, 215, 242, 272, 250, null] },
-        
-        // --- 歷史 ---
-        { c: "康健人壽(已併)", data: [300, 1052, 1458, 1322, 1370, 1357, 1362, 1184, 1147, 1017, 988, 718, 721, 727, 733, 432, null, null, null, null, null, null], hist: true },
-        { c: "蘇黎世人壽(已併)", data: [300, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], hist: true }
+        { c: "宏泰人壽", data: [150, 307, 291, 295, 309, 290, 251, 225, 227, 239, 207, 164, 232, 259, 228, 205, 146, 215, 242, 272, 250, null] }
     ];
 
     const groups = {
@@ -167,8 +162,8 @@
         
         top6: ["國泰人壽", "富邦人壽", "南山人壽", "新光人壽", "凱基人壽", "台灣人壽"],
         watch: ["三商美邦", "新光人壽", "宏泰人壽", "遠雄人壽"],
-        high: ["安聯人壽", "友邦人壽", "安達人壽", "康健人壽(已併)", "法國巴黎"],
-        history: ["康健人壽(已併)", "蘇黎世人壽(已併)"]
+        high: ["安聯人壽", "友邦人壽", "安達人壽", "法國巴黎"],
+        // 隱藏歷史群組
     };
 
     let chartInstance = null;
@@ -176,12 +171,19 @@
 
     function init() {
         const cbList = document.getElementById('checkboxList');
+        // 只顯示現存的 21 家 (DB 中所有項目)
+        // 為了美觀，可以加個小標題
+        const title = document.createElement('h4');
+        title.innerText = "現存公司列表 (21家)";
+        title.style.margin = "10px 0 5px 0";
+        title.style.fontSize = "0.85rem";
+        title.style.color = "#777";
+        cbList.appendChild(title);
+
         db.forEach(item => {
             const div = document.createElement('label');
             div.className = 'checkbox-item';
-            let nameDisplay = item.c;
-            if(item.hist) nameDisplay += " <span class='tag-history'>(歷史)</span>";
-            div.innerHTML = `<input type="checkbox" value="${item.c}" onchange="refresh()"> ${nameDisplay}`;
+            div.innerHTML = `<input type="checkbox" value="${item.c}" onchange="refresh()"> ${item.c}`;
             cbList.appendChild(div);
         });
         filter('beian'); // 預設顯示倍安代理
@@ -218,7 +220,6 @@
             let color = `hsl(${idx * 40 % 360}, 70%, 50%)`;
             if(name === "三商美邦") color = "#c0392b";
             if(name === "安達人壽") color = "#8e44ad";
-            if(name === "康健人壽(已併)") color = "#7f8c8d";
             
             return {
                 label: name,
