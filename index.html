@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>台灣壽險業 RBC 精確數據看板 (含全選功能)</title>
+    <title>台灣壽險業 RBC 精確數據看板 (含全選按鈕)</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -31,15 +31,14 @@
         button.btn-filter strong { display: block; font-size: 0.75rem; color: #888; margin-top: 3px; font-weight: normal; }
 
         /* 倍安專屬按鈕樣式 */
-        button.btn-beian { 
-            border: 2px solid #9b59b6; 
-            background-color: #fcf4ff; 
-            color: #8e44ad; 
-            font-weight: bold;
-        }
+        button.btn-beian { border: 2px solid #9b59b6; background-color: #fcf4ff; color: #8e44ad; font-weight: bold; }
         button.btn-beian:hover { background-color: #f5eef9; }
         button.btn-beian strong { color: #9b59b6; }
         
+        /* 全選按鈕樣式 */
+        button.btn-all { background-color: #e0e0e0; border-color: #bbb; font-weight: bold; color: #333; }
+        button.btn-all:hover { background-color: #d0d0d0; }
+
         .toggle-btn { background: var(--accent); color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-bottom: 10px; width: 100%; font-size: 0.95rem; }
         
         .checkbox-item { display: flex; align-items: center; gap: 8px; padding: 8px 5px; cursor: pointer; font-size: 0.9rem; border-bottom: 1px solid #f9f9f9; }
@@ -98,7 +97,7 @@
         <button class="btn-filter" onclick="filter('watch')">觀察名單 (三商/宏泰...)</button>
         
         <button class="btn-filter" style="background:#f1f1f1; border-color:#ccc;" onclick="reset()">清除所有選擇</button>
-        <button class="btn-filter" style="background:#e0e0e0; border-color:#bbb; font-weight:bold;" onclick="selectAll()">顯示全部 (21家)</button>
+        <button class="btn-filter btn-all" onclick="selectAll()">顯示全部 (21家)</button>
 
         <h3>公司列表</h3>
         <div id="checkboxList"></div>
@@ -161,7 +160,6 @@
     const groups = {
         // 倍安代理 9 家
         beian: ["新光人壽", "台灣人壽", "全球人壽", "遠雄人壽", "安達人壽", "友邦人壽", "保誠人壽", "元大人壽", "富邦人壽"],
-        
         top6: ["國泰人壽", "富邦人壽", "南山人壽", "新光人壽", "凱基人壽", "台灣人壽"],
         watch: ["三商美邦", "新光人壽", "宏泰人壽", "遠雄人壽"],
         high: ["安聯人壽", "友邦人壽", "安達人壽", "法國巴黎"]
