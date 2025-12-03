@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>台灣壽險業 RBC 精確數據看板 (倍安代理版)</title>
+    <title>台灣壽險業 RBC 精確數據看板 (倍安代理專用版)</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -26,13 +26,20 @@
         .sidebar { width: var(--sidebar-w); background: white; border-right: 1px solid #ddd; display: flex; flex-direction: column; padding: 10px; overflow-y: auto; flex-shrink: 0; z-index: 50; }
         .sidebar h3 { font-size: 0.85rem; color: #7f8c8d; margin: 15px 0 5px 0; border-bottom: 2px solid #eee; padding-bottom: 5px; font-weight: bold; }
         
-        button.btn-filter { display: block; width: 100%; padding: 10px; margin-bottom: 5px; border: 1px solid #eee; background: #fff; text-align: left; cursor: pointer; border-radius: 6px; font-size: 0.9rem; transition: 0.2s; }
+        button.btn-filter { display: block; width: 100%; padding: 12px; margin-bottom: 6px; border: 1px solid #eee; background: #fff; text-align: left; cursor: pointer; border-radius: 6px; font-size: 0.95rem; transition: 0.2s; }
         button.btn-filter:hover { background: #eaf2f8; border-color: var(--accent); color: var(--accent); }
-        
-        /* 特別強調倍安按鈕 */
-        button.btn-beian { border-left: 4px solid #8e44ad; background: #fdfaff; }
-        button.btn-beian:hover { background: #f3e5f5; border-color: #8e44ad; }
+        button.btn-filter strong { display: block; font-size: 0.75rem; color: #888; margin-top: 3px; font-weight: normal; }
 
+        /* 倍安專屬按鈕樣式 */
+        button.btn-beian { 
+            border: 2px solid #9b59b6; 
+            background-color: #fcf4ff; 
+            color: #8e44ad; 
+            font-weight: bold;
+        }
+        button.btn-beian:hover { background-color: #f5eef9; }
+        button.btn-beian strong { color: #9b59b6; }
+        
         .toggle-btn { background: var(--accent); color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-bottom: 10px; width: 100%; font-size: 0.95rem; }
         
         .checkbox-item { display: flex; align-items: center; gap: 8px; padding: 8px 5px; cursor: pointer; font-size: 0.9rem; border-bottom: 1px solid #f9f9f9; }
@@ -60,7 +67,7 @@
         @media (max-width: 768px) {
             .container { flex-direction: column; overflow: visible; height: auto; }
             body { overflow-y: auto; height: auto; }
-            .sidebar { width: 100%; max-height: 300px; border-right: none; border-bottom: 2px solid #ddd; }
+            .sidebar { width: 100%; max-height: 350px; border-right: none; border-bottom: 2px solid #ddd; }
             .content { height: 600px; overflow: visible; flex: none; }
             .chart-box { min-height: 400px; }
             h1 { font-size: 0.9rem; }
@@ -71,7 +78,7 @@
 <body>
 
 <header>
-    <h1>壽險業 RBC 詳細數據 (倍安代理)</h1>
+    <h1>壽險業 RBC 精確數據 (倍安代理)</h1>
     <div class="source-badge">資料來源：公開資訊觀測站 & 公開說明文件</div>
 </header>
 
@@ -79,8 +86,7 @@
     <div class="sidebar">
         <button class="toggle-btn" onclick="toggleView()">切換檢視：圖表 / 表格</button>
 
-        <h3>合作夥伴篩選</h3>
-        
+        <h3>合作夥伴專區</h3>
         <button class="btn-filter btn-beian" onclick="filter('beian')">
             ★ 倍安代理 (9家)
             <strong>新光、台灣、全球、遠雄、安達、友邦、保誠、元大、富邦</strong>
@@ -88,9 +94,9 @@
 
         <h3>一般分類</h3>
         <button class="btn-filter" onclick="filter('top6')">六大壽險 (國泰/富邦...)</button>
-        <button class="btn-filter" onclick="filter('watch')">觀察名單 (三商/宏泰...)</button>
         <button class="btn-filter" onclick="filter('high')">高資本群 (安聯/安達...)</button>
-        <button class="btn-filter" onclick="filter('history')">歷史/併購 (康健/蘇黎世)</button>
+        <button class="btn-filter" onclick="filter('watch')">觀察名單 (三商/宏泰...)</button>
+        <button class="btn-filter" onclick="filter('history')">歷史/併購 (康健/蘇黎世...)</button>
         <button class="btn-filter" style="background:#eee" onclick="reset()">清除所有選擇</button>
 
         <h3>公司列表</h3>
@@ -108,7 +114,7 @@
             </table>
         </div>
         <div class="footer">
-            * 數據已依據最新財報與截圖校正 | 114年數據為H1
+            * 數據整理自上傳檔案與最新財報 | 三商美邦114H1為154.27%
         </div>
     </div>
 </div>
