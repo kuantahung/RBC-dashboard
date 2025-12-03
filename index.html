@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>台灣壽險業 RBC 精確數據看板 (遠雄移除修正版)</title>
+    <title>台灣壽險業 RBC 精確數據看板 (全選功能版)</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -96,7 +96,9 @@
         <button class="btn-filter" onclick="filter('top6')">六大壽險 (國泰/富邦...)</button>
         <button class="btn-filter" onclick="filter('high')">高資本群 (安聯/安達...)</button>
         <button class="btn-filter" onclick="filter('watch')">觀察名單 (三商/宏泰...)</button>
-        <button class="btn-filter" style="background:#eee" onclick="reset()">清除所有選擇</button>
+        
+        <button class="btn-filter" style="background:#f1f1f1; border-color:#ccc;" onclick="reset()">清除所有選擇</button>
+        <button class="btn-filter" style="background:#e0e0e0; border-color:#bbb; font-weight:bold;" onclick="selectAll()">顯示全部 (21家)</button>
 
         <h3>公司列表</h3>
         <div id="checkboxList"></div>
@@ -161,8 +163,7 @@
         beian: ["新光人壽", "台灣人壽", "全球人壽", "遠雄人壽", "安達人壽", "友邦人壽", "保誠人壽", "元大人壽", "富邦人壽"],
         
         top6: ["國泰人壽", "富邦人壽", "南山人壽", "新光人壽", "凱基人壽", "台灣人壽"],
-        // 觀察名單移除遠雄
-        watch: ["三商美邦", "新光人壽", "宏泰人壽"],
+        watch: ["三商美邦", "新光人壽", "宏泰人壽", "遠雄人壽"],
         high: ["安聯人壽", "友邦人壽", "安達人壽", "法國巴黎"]
     };
 
@@ -184,6 +185,13 @@
         const targets = groups[key] || [];
         document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
             cb.checked = targets.includes(cb.value);
+        });
+        refresh();
+    }
+
+    function selectAll() {
+        document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+            cb.checked = true;
         });
         refresh();
     }
